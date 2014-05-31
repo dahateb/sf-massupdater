@@ -148,13 +148,14 @@ public class SalesforceConnector {
 
         try {
             SaveResult[] saveResults = connection.update(objects);
-
+            
             int successCount = 0;
 
             for (SaveResult res : saveResults) {
                 if (res.isSuccess()) {
                     successCount++;
                 } else {
+                    errorMessage = "";
                     for (int i = 0; i < res.getErrors().length; i++) {
                         success = false;
                         errorMessage += res.getErrors()[i] + " ";
