@@ -3,7 +3,7 @@ sf-massupdater
 
 ## Libraries used
 
-* commons-lang3-3.3.2-javadoc.jar
+* commons-lang3-3.3.2.jar
 * force-wsc-31.0.0.jar
 * partner.jar (generated from partner.wsdl)
 
