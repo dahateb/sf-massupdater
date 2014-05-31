@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package my.massupdate.listener;
+package my.massupdater.listener;
 
 
 import java.util.HashMap;

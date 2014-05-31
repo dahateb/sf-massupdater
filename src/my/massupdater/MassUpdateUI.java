@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import javax.swing.JLabel;
 import javax.swing.table.TableModel;
-import my.massupdate.listener.TableListener;
+import my.massupdater.listener.TableListener;
 import my.massupdater.salesforce.SalesforceConnector;
 
 /**
