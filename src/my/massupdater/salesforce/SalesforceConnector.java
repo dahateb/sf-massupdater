@@ -7,6 +7,7 @@ package my.massupdater.salesforce;
 
 import com.sforce.soap.partner.DescribeSObjectResult;
 import com.sforce.soap.partner.Field;
+import com.sforce.soap.partner.FieldType;
 import com.sforce.soap.partner.GetUserInfoResult;
 import com.sforce.soap.partner.PartnerConnection;
 import com.sforce.soap.partner.QueryResult;
@@ -15,6 +16,7 @@ import com.sforce.soap.partner.sobject.SObject;
 import com.sforce.ws.ConnectionException;
 import com.sforce.ws.ConnectorConfig;
 import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -30,7 +32,9 @@ public class SalesforceConnector {
     protected String[][] queryResult;
     protected String[] queryFields;
     protected String queryObject;
-
+    protected DescribeSObjectResult objectType;
+    protected Map<String,Field> fieldMap;        
+    
     private SalesforceConnector() {
         errorMessage = "";
     }
@@ -75,7 +79,7 @@ public class SalesforceConnector {
     public boolean query(String soqlQuery) {
         String queryObject;
         String fieldPart = StringUtils.substringBetween(soqlQuery.toUpperCase(), "SELECT", "FROM");
-
+        fieldMap = new HashMap<>();
         queryFields = fieldPart.split(",");
         if (soqlQuery.contains("WHERE")) {
             queryObject = StringUtils.substringBetween(soqlQuery.toUpperCase(), "FROM ", " WHERE");
@@ -102,6 +106,11 @@ public class SalesforceConnector {
         System.out.println(fieldPart);
         System.out.println(queryObject);
         try {
+            
+            objectType = connection.describeSObject(queryObject);
+            for(Field fld: objectType.getFields()){
+                fieldMap.put(fld.getName(), fld);
+            }
             QueryResult qr = connection.query(soqlQuery);
             System.out.println(qr.getSize());
             queryResult = new String[qr.getSize()][queryFields.length];
@@ -140,7 +149,19 @@ public class SalesforceConnector {
             obj.setType(this.queryObject);
             obj.setId(id);
             for (String fieldName : idMap2ValuesMap.get(id).keySet()) {
-                obj.setField(fieldName, idMap2ValuesMap.get(id).get(fieldName));
+                Field fld = fieldMap.get(fieldName);
+                FieldType type =  fld.getType();
+                
+                if(FieldType._boolean == type) {
+                    obj.setField(fieldName,Boolean.valueOf(idMap2ValuesMap.get(id).get(fieldName)));
+                }else if(FieldType._int == type){
+                    obj.setField(fieldName,Integer.valueOf(idMap2ValuesMap.get(id).get(fieldName)));
+                }else if(FieldType._double == type || FieldType.percent == type || FieldType.currency == type){
+                    obj.setField(fieldName,Double.valueOf(idMap2ValuesMap.get(id).get(fieldName)));
+                }else {
+                    obj.setField(fieldName,idMap2ValuesMap.get(id).get(fieldName));
+                }
+                
             }
             objects[count] = obj;
             count++;
