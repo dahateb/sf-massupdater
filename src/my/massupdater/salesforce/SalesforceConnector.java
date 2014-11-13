@@ -84,7 +84,7 @@ public class SalesforceConnector {
         if (soqlQuery.contains("WHERE")) {
             queryObject = StringUtils.substringBetween(soqlQuery.toUpperCase(), "FROM ", " WHERE");
         } else {
-            queryObject = StringUtils.substringAfter(soqlQuery, "FROM ");
+            queryObject = StringUtils.substringBetween(soqlQuery, "FROM ", " ");
         }
         //query real Names to match headers
         try {
